@@ -1,5 +1,14 @@
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let jsdom = require("jsdom");
+
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+
+global.document = document;
+let router = express.Router();
+
+let jQuery = require('jquery')(window);
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -10,14 +19,6 @@ module.exports = router;
 
 console.log('\nBinding index.js...');
 console.log('Setting up parser function... ');
-
-let jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = new JSDOM();
-const { document } = (new JSDOM('')).window;
-global.document = document;
-
-let $ = jQuery = require('jquery')(window);
 
 /* https://stackoverflow.com/questions/33145762/parse-a-srt-file-with-jquery-javascript/33147421 */
 let PF_SRT = function() {
@@ -41,7 +42,8 @@ let PF_SRT = function() {
             result.push(toLineObj(matches));
         }
         return result;
-    }
+    };
+
     var toLineObj = function(group) {
         return {
             line: group[1],
@@ -49,8 +51,10 @@ let PF_SRT = function() {
             endTime: group[3],
             text: group[4]
         };
-    }
+    };
+
     init();
+
     return {
         parse: parse
     }
