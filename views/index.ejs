@@ -24,6 +24,7 @@
 <div class="container">
     <div class="col-lg-7 centered">
         <div class="row" style="margin-top: 20px">
+
             <video id="video_player" class="video-js" controls preload="none" width="640" height="360"
                    poster="http://d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
 
@@ -36,9 +37,9 @@
 
         <div class="row" style="margin-top: 20px">
             <div class="panel panel-default">
-                <div class="panel-heading">Original Caption</div>
+                <div class="panel-heading" id="original_caption_header">Original Caption</div>
                 <div class="panel-body" id="original_caption">
-                    Original Caption
+                    <%= text %>
                 </div>
             </div>
 
@@ -47,7 +48,7 @@
                     <label for="edit_caption" class="sr-only">Current Subtitle</label>
                     <input type="text" class="form-control" id="edit_caption" placeholder="Subtitle">
                 </div>
-                <button type="submit" class="btn btn-primary mb-2">Update Subtitle</button>
+                <button id="doParse" type="submit" class="btn btn-primary mb-2">Update Subtitle</button>
             </form>
         </div>
 
@@ -56,16 +57,8 @@
     <div class="col-lg-5">
         <p> Subtitles </p>
 
-        <div class="list-group">
-            <% captions.forEach(function(caption){ %>
-                <a href="#" onclick="loadData(<%= JSON.stringify(caption) %>)" class="list-group-item list-group-item-action flex-column align-items-start">
-                    <div class="d-flex w-100 justify-content-between">
-                        <small><%= caption.line %></small>
-                    </div>
-                    <p class="mb-1"><%= caption.text %></p>
-                    <small><%= caption.startTime %> --> <%= caption.endTime %></small>
-                </a>
-            <% })%>
+        <div class="list-group" id="subtitle_list">
+
         </div>
     </div>
 
@@ -76,11 +69,77 @@
     let player = videojs('video_player');
     console.log(player.duration());
 </script>
+
 <script>
     function loadData(caption) {
         document.getElementById("original_caption").innerHTML = caption.text;
+        document.getElementById("original_caption_header").innerHTML = caption.startTime + " --> " + caption.endTime;
         document.getElementById("edit_caption").innerHTML = "CLICKED!";
     }
+</script>
+
+<script>
+    /* https://stackoverflow.com/questions/33145762/parse-a-srt-file-with-jquery-javascript/33147421 */
+    var PF_SRT = function() {
+        var pattern = /(\d+)\n([\d:,]+)\s+-{2}\>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
+        var _regExp;
+
+        var init = function() {
+            _regExp = new RegExp(pattern);
+        };
+        var parse = function(f) {
+            if (typeof(f) !== "string")
+                throw "Sorry, Parser accept string only.";
+
+            var result = [];
+            if (f == null)
+                return _subtitles;
+
+            f = f.replace(/\r\n|\r|\n/g, '\n')
+
+            while ((matches = pattern.exec(f)) != null) {
+                result.push(toLineObj(matches));
+            }
+            return result;
+        }
+        var toLineObj = function(group) {
+            return {
+                line: group[1],
+                startTime: group[2],
+                endTime: group[3],
+                text: group[4]
+            };
+        }
+        init();
+        return {
+            parse: parse
+        }
+    }();
+
+    $(function() {
+        $("#doParse").on('click', function() {
+            try {
+                var text = $("#source").val();
+                var result = PF_SRT.parse(text);
+                var wrapper = $("#subtitle_list");
+                wrapper.html('');
+                for (var line in result) {
+                    var obj = result[line];
+                    wrapper.append(
+                        "<a class='list-group-item list-group-item-action flex-column align-items-start'>"
+                        + "<div class='d-flex w-100 justify-content-between'>" +
+                        + "<small>" + obj.line + "</small>"
+                        + "</div>"
+                        + "<p class=\"mb-1\">" + obj.text + "</p>"
+                        + "<small>" + obj.startTime + " --> " + obj.endTime + "</small>"
+                        + "</a>"
+                    );
+                }
+            } catch (e) {
+                alert(e);
+            }
+        });
+    });
 </script>
 </body>
 </html>

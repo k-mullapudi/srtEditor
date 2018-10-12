@@ -12,6 +12,7 @@ global.document = document;
 
 module.exports = router;
 
+let text_ = "";
 let captions_ = [];
 
 /**
@@ -21,6 +22,7 @@ fs.readFile(process.cwd() + '/routes/subtitles.srt', 'utf8', function (err, data
     if (err) {
         return console.log(err);
     }
+    text_ = data;
     captions_ = SRT_PARSER.parse(data);
     console.log("Contents loaded...");
 });
@@ -41,7 +43,7 @@ let getText = function(caption) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { captions: captions_});
+  res.render('index', { text: text_, captions: captions_});
 });
 
 console.log("Reading contents...");
