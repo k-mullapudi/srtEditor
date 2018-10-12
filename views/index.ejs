@@ -9,60 +9,81 @@
     <!-- jQuery cdn -->
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="../routes/index.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
 </head>
 
 <body>
-<div>
-    <video id="example_video_1" class="video-js" controls preload="none" width="640" height="360"
-           data-setup='{ "html5" : { "nativeTextTracks" : false } }'
-           poster="http://d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
+<nav class="navbar navbar-default"> </nav>
 
-        <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
-        <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
+<div class="container">
+    <div class="col-lg-8 centered">
+        <div class="row" style="margin-top: 20px">
+            <video id="video_" class="video-js" controls preload="none" width="640" height="360"
+                   data-setup='{ "html5" : { "nativeTextTracks" : false } }'
+                   poster="http://d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
 
-        <track kind="captions" src="captions.en.vtt" srclang="en" label="English" default>
-        <track kind="captions" src="captions.sv.vtt" srclang="sv" label="Swedish">
-        <track kind="captions" src="captions.ru.vtt" srclang="ru" label="Russian">
-        <track kind="captions" src="captions.ja.vtt" srclang="ja" label="Japanese">
-        <track kind="captions" src="captions.ar.vtt" srclang="ar" label="Arabic">
+                <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
+                <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
 
-        <track kind="descriptions" src="descriptions.en.vtt" srclang="en" label="English">
+                <track kind="captions" src="captions.en.vtt" srclang="en" label="English" default>
+                <track kind="captions" src="captions.sv.vtt" srclang="sv" label="Swedish">
+                <track kind="captions" src="captions.ru.vtt" srclang="ru" label="Russian">
+                <track kind="captions" src="captions.ja.vtt" srclang="ja" label="Japanese">
+                <track kind="captions" src="captions.ar.vtt" srclang="ar" label="Arabic">
 
-        <track kind="chapters" src="chapters.en.vtt" srclang="en" label="English">
+                <track kind="descriptions" src="descriptions.en.vtt" srclang="en" label="English">
 
-        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-    </video>
-</div>
-<div>
-    <p> Subtitles </p>
-    <div class="wrapper">
-    <textarea id="source">
-        <%= text %>
-    </textarea>
-        <input name="parse" id="doParse" value="Parse" type="submit" />
-        <script>
-            $('#doParse').click(function() {
-                $.post('/parse');
-            });
-        </script>
+                <track kind="chapters" src="chapters.en.vtt" srclang="en" label="English">
+
+                <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+            </video>
+        </div>
+
+        <div class="row" style="margin-top: 20px">
+            <div class="panel panel-default">
+                <div class="panel-heading">Original Caption</div>
+                <div class="panel-body">
+                    Original Caption
+                </div>
+            </div>
+
+            <form class="form">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="inputPassword2" class="sr-only">Current Subtitle</label>
+                    <input type="text" class="form-control" id="inputPassword2" placeholder="Subtitle">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Update Subtitle</button>
+            </form>
+        </div>
+
     </div>
 
-    <div class="wrapper">
-        <table id="result">
-            <thead>
-            <tr>
-                <th>Line</th>
-                <th>startTime</th>
-                <th>endTime</th>
-                <th>Text</th>
-            </tr>
-            </thead>
-            <tbody><tr><td colspan="4">...</td></tr></tbody>
-        </table>
-    </div>
-</div>
+    <div class="col-lg-4">
+        <p> Subtitles </p>
 
+        <div class="list-group">
+            <% captions.forEach(function(caption){ %>
+                <a href="#" class="list-group-item">
+                    <%= caption.text %>
+                </a>
+            <% })%>
+        </div>
+    </div>
+
+</div>
 
 <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
+<script>
+    videojs('video_').ready(function () {
+        this.on('timeupdate', function () {
+            console.log(this.currentTime());
+        })
+    });
+</script>
 </body>
 </html>

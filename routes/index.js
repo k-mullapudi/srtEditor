@@ -12,23 +12,45 @@ let jQuery = require('jquery')(window);
 let router = express.Router();
 
 let text_;
+let captions_ = [];
 
 fs.readFile(process.cwd() + '/routes/subtitles.srt', 'utf8', function (err, data) {
     if (err) {
         return console.log(err);
     }
 
+    let pattern = /(\d+)\n([\d:,]+)\s+-{2}>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
+    let _regExp;
+
+    let init = function() {
+        _regExp = new RegExp(pattern);
+    };
+
     text_ = data; // loading text
+    text_ = text_.replace(/\r\n|\r|\n/g, '\n');
+
+    while ((matches = pattern.exec(text_)) != null) {
+        captions_.push(getText(matches));
+    }
+
+    init();
+
     console.log("Contents loaded...");
 });
 
+let getText = function(caption) {
+    return {
+        text: caption[4]
+    }
+};
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { text: text_ });
+  res.render('index', { text: text_,  captions: captions_});
 });
 
-router.post('/parse', function(req, res) {
-   parseData();
+router.get('/parse', function(req, res) {
+    res.render('index', { text: text_,  captions: captions_, current_caption: "Lo siento."});
 });
 
 module.exports = router;
