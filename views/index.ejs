@@ -5,18 +5,97 @@
 
     <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
     <script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+
+    <!-- jQuery cdn -->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 </head>
 
 <body>
-<video id="example_video_1" class="video-js vjs-default-skin"
-       controls preload="auto" width="640" height="264"
-       poster="http://video-js.zencoder.com/oceans-clip.png"
-       data-setup='{"example_option":true}'>
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4" />
-    <source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm" />
-    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg" />
-    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-</video>
+<div>
+    <video id="example_video_1" class="video-js" controls preload="none" width="640" height="360"
+           data-setup='{ "html5" : { "nativeTextTracks" : false } }'
+           poster="http://d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
+
+        <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
+        <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
+
+        <track kind="captions" src="captions.en.vtt" srclang="en" label="English" default>
+        <track kind="captions" src="captions.sv.vtt" srclang="sv" label="Swedish">
+        <track kind="captions" src="captions.ru.vtt" srclang="ru" label="Russian">
+        <track kind="captions" src="captions.ja.vtt" srclang="ja" label="Japanese">
+        <track kind="captions" src="captions.ar.vtt" srclang="ar" label="Arabic">
+
+        <track kind="descriptions" src="descriptions.en.vtt" srclang="en" label="English">
+
+        <track kind="chapters" src="chapters.en.vtt" srclang="en" label="English">
+
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+    </video>
+</div>
+<div>
+    <p> Subtitles </p>
+    <div class="wrapper">
+  <textarea id="source">1
+00:00:01,000 --> 00:00:04,000
+Descargados de www.AllSubs.org
+
+2
+00:00:49,581 --> 00:00:52,049
+Bueno, tienes que escapar, tengo que ir a jugar
+
+3
+00:00:52,084 --> 00:00:55,178
+Tengo que encontrar un día que está lleno de nada más que sol
+
+4
+00:00:55,220 --> 00:00:57,552
+Crucero por la calle, moviéndose al compás
+
+5
+00:00:57,589 --> 00:01:00,683
+Todos los que conoces está teniendo nada más que diversión
+
+6
+00:01:00,726 --> 00:01:03,251
+Deja todo detrás de ti
+
+7
+00:01:03,295 --> 00:01:06,128
+Siente esas palmeras soplan
+
+8
+00:01:06,165 --> 00:01:09,157
+
+
+9
+00:01:09,201 --> 00:01:11,829
+Están fuera de palear la nieve
+
+10
+00:01:11,870 --> 00:01:14,998
+El tiempo para moverse, pero no seas lento
+
+11
+00:01:15,040 --> 00:01:17,941
+En sus marcas, prepárate para ir</textarea>
+        <button id="doParse">Do Parse</button>
+    </div>
+
+    <div class="wrapper">
+        <table id="result">
+            <thead>
+            <tr>
+                <th>Line</th>
+                <th>startTime</th>
+                <th>endTime</th>
+                <th>Text</th>
+            </tr>
+            </thead>
+            <tbody><tr><td colspan="4">...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
 
 <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
 </body>
