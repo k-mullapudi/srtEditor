@@ -58,13 +58,16 @@
 const express = require('express');
 const app = express();
 
+const hostname = '127.0.0.1';
+const port = 3000;
+
 app.get('/', function (req, res) {
     // NEW CODE
     res.render('index');
-})
+});
 
 app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
+    console.log(`Server running at http://${hostname}:${port}/`);
 });
 
 app.set('view engine', 'ejs');
