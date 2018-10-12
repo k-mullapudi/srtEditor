@@ -5,60 +5,48 @@ let fs = require('fs');
 const { JSDOM } = jsdom;
 const { window } = new JSDOM();
 const { document } = (new JSDOM('')).window;
-
-global.document = document;
-
 let jQuery = require('jquery')(window);
 let router = express.Router();
 
-let text_;
+global.document = document;
+
+module.exports = router;
+
 let captions_ = [];
 
+/**
+ * Reading initial subtitles from .srt
+ */
 fs.readFile(process.cwd() + '/routes/subtitles.srt', 'utf8', function (err, data) {
     if (err) {
         return console.log(err);
     }
-
-    let pattern = /(\d+)\n([\d:,]+)\s+-{2}>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
-    let _regExp;
-
-    let init = function() {
-        _regExp = new RegExp(pattern);
-    };
-
-    text_ = data; // loading text
-    text_ = text_.replace(/\r\n|\r|\n/g, '\n');
-
-    while ((matches = pattern.exec(text_)) != null) {
-        captions_.push(getText(matches));
-    }
-
-    init();
-
+    captions_ = SRT_PARSER.parse(data);
     console.log("Contents loaded...");
 });
 
+/**
+ * Helper function to break down each entry in .srt file
+ * @param caption
+ * @returns {{line: *, startTime: *, endTime: *, text: *}}
+ */
 let getText = function(caption) {
     return {
+        line: caption[1],
+        startTime: caption[2],
+        endTime: caption[3],
         text: caption[4]
     }
 };
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { text: text_,  captions: captions_});
+  res.render('index', { captions: captions_});
 });
-
-router.get('/parse', function(req, res) {
-    res.render('index', { text: text_,  captions: captions_, current_caption: "Lo siento."});
-});
-
-module.exports = router;
 
 console.log("Reading contents...");
 
-/* https://stackoverflow.com/questions/33145762/parse-a-srt-file-with-jquery-javascript/33147421 */
-let PF_SRT = function() {
+let SRT_PARSER = function() {
     let pattern = /(\d+)\n([\d:,]+)\s+-{2}>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
     let _regExp;
 
@@ -74,23 +62,15 @@ let PF_SRT = function() {
         let result = [];
 
         if (f == null)
-            return _subtitles;
+            return result;
 
         f = f.replace(/\r\n|\r|\n/g, '\n');
 
-        while ((matches = pattern.exec(f)) != null) {
-            result.push(toLineObj(matches));
+        while ((captions = pattern.exec(f)) != null) {
+            result.push(getText(captions));
         }
-        return result;
-    };
 
-    let toLineObj = function(group) {
-        return {
-            line: group[1],
-            startTime: group[2],
-            endTime: group[3],
-            text: group[4]
-        };
+        return result;
     };
 
     init();
@@ -105,7 +85,7 @@ let parseData = function() {
 
     try {
         // let text = $("#source").val();
-        let result = PF_SRT.parse(text_);
+        let result = SRT_PARSER.parse(text_);
         let wrapper = jQuery("#result tbody");
         wrapper.html('');
         for (let line in result) {

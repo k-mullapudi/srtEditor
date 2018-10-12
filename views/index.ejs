@@ -4,11 +4,12 @@
     <link href="https://vjs.zencdn.net/7.2.3/video-js.css" rel="stylesheet">
 
     <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
-    <script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+    <!--<script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>-->
 
     <!-- jQuery cdn -->
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="../routes/index.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
+    </script>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -21,24 +22,13 @@
 <nav class="navbar navbar-default"> </nav>
 
 <div class="container">
-    <div class="col-lg-8 centered">
+    <div class="col-lg-7 centered">
         <div class="row" style="margin-top: 20px">
-            <video id="video_" class="video-js" controls preload="none" width="640" height="360"
-                   data-setup='{ "html5" : { "nativeTextTracks" : false } }'
+            <video id="video_player" class="video-js" controls preload="none" width="640" height="360"
                    poster="http://d2zihajmogu5jn.cloudfront.net/elephantsdream/poster.png">
 
                 <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.mp4" type="video/mp4">
                 <source src="//d2zihajmogu5jn.cloudfront.net/elephantsdream/ed_hd.ogg" type="video/ogg">
-
-                <track kind="captions" src="captions.en.vtt" srclang="en" label="English" default>
-                <track kind="captions" src="captions.sv.vtt" srclang="sv" label="Swedish">
-                <track kind="captions" src="captions.ru.vtt" srclang="ru" label="Russian">
-                <track kind="captions" src="captions.ja.vtt" srclang="ja" label="Japanese">
-                <track kind="captions" src="captions.ar.vtt" srclang="ar" label="Arabic">
-
-                <track kind="descriptions" src="descriptions.en.vtt" srclang="en" label="English">
-
-                <track kind="chapters" src="chapters.en.vtt" srclang="en" label="English">
 
                 <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
             </video>
@@ -47,15 +37,15 @@
         <div class="row" style="margin-top: 20px">
             <div class="panel panel-default">
                 <div class="panel-heading">Original Caption</div>
-                <div class="panel-body">
+                <div class="panel-body" id="original_caption">
                     Original Caption
                 </div>
             </div>
 
             <form class="form">
                 <div class="form-group mx-sm-3 mb-2">
-                    <label for="inputPassword2" class="sr-only">Current Subtitle</label>
-                    <input type="text" class="form-control" id="inputPassword2" placeholder="Subtitle">
+                    <label for="edit_caption" class="sr-only">Current Subtitle</label>
+                    <input type="text" class="form-control" id="edit_caption" placeholder="Subtitle">
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Update Subtitle</button>
             </form>
@@ -63,13 +53,17 @@
 
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-lg-5">
         <p> Subtitles </p>
 
         <div class="list-group">
             <% captions.forEach(function(caption){ %>
-                <a href="#" class="list-group-item">
-                    <%= caption.text %>
+                <a href="#" onclick="loadData(<%= JSON.stringify(caption) %>)" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <small><%= caption.line %></small>
+                    </div>
+                    <p class="mb-1"><%= caption.text %></p>
+                    <small><%= caption.startTime %> --> <%= caption.endTime %></small>
                 </a>
             <% })%>
         </div>
@@ -79,11 +73,14 @@
 
 <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
 <script>
-    videojs('video_').ready(function () {
-        this.on('timeupdate', function () {
-            console.log(this.currentTime());
-        })
-    });
+    let player = videojs('video_player');
+    console.log(player.duration());
+</script>
+<script>
+    function loadData(caption) {
+        document.getElementById("original_caption").innerHTML = caption.text;
+        document.getElementById("edit_caption").innerHTML = "CLICKED!";
+    }
 </script>
 </body>
 </html>
