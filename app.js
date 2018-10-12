@@ -20,7 +20,7 @@ app.listen(3000, function () {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-app.use(logger('dev'));
+// app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
