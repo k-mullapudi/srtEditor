@@ -4,6 +4,7 @@
       <w>jsdom</w>
       <w>loadedmetadata</w>
       <w>timeupdate</w>
+      <w>videojs</w>
     </words>
   </dictionary>
 </component>

@@ -16,6 +16,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
     </script>
+
     <script src="/javascripts/index.js"></script>
 </head>
 
@@ -66,45 +67,6 @@
 </div>
 
 <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
-<script>
-    let player = videojs('video_player');
-    console.log(player.duration());
-</script>
 
-<script>
-    function loadData(caption) {
-        document.getElementById("original_caption").innerHTML = caption.text;
-        document.getElementById("original_caption_header").innerHTML = caption.startTime + " --> " + caption.endTime;
-        document.getElementById("edit_caption").innerHTML = "CLICKED!";
-    }
-</script>
-
-<script>
-
-    $(function() {
-        $("#doParse").on('click', function() {
-            try {
-                var text = $("#source").val();
-                var result = PF_SRT.parse(text);
-                var wrapper = $("#subtitle_list");
-                wrapper.html('');
-                for (var line in result) {
-                    var obj = result[line];
-                    wrapper.append(
-                        "<a class='list-group-item list-group-item-action flex-column align-items-start'>"
-                        + "<div class='d-flex w-100 justify-content-between'>" +
-                        + "<small>" + obj.line + "</small>"
-                        + "</div>"
-                        + "<p class=\"mb-1\">" + obj.text + "</p>"
-                        + "<small>" + obj.startTime + " --> " + obj.endTime + "</small>"
-                        + "</a>"
-                    );
-                }
-            } catch (e) {
-                alert(e);
-            }
-        });
-    });
-</script>
 </body>
 </html>

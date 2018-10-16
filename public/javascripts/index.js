@@ -1,10 +1,17 @@
-import zeroFill from 'zero-fill'
-import * as FileSaver from "FileSaver";
+console.log('Reached here');
 
-let video = videojs('video_player');
-let parse = document.querySelector('doParse');
+$('#doParse').on('click', function() {
+    doUpdateCaption()
+});
 
-parse.onclick(doUpdateCaption());
+function zeroFill( number, width ) {
+    width -= number.toString().length;
+    if ( width > 0 )
+    {
+        return new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number;
+    }
+    return number + ""; // always return a string
+}
 
 let duration_ = -1; // duration of current video
 let _current_index = -1; // index of current subtitle
@@ -101,19 +108,21 @@ function videoAndSubtitleTracking() {
 
     // listening for event fired when initial duration and dimension
     // information is ready
-    video.on('loadedmetadata', function() {
+    videojs('video_player').on('loadedmetadata', function() {
         // keeping track of current video's duration
         duration_ = video.duration();
         _current_index = 0;
     });
 
     // listening for event fired when video is paused
-    video.on('pause', function() {
+    // loads captions for current time in caption editor container
+    videojs('video_player').on('pause', function() {
         console.log("Paused");
+        doLoadCurrentCaption();
     });
 
     // updates current subtitle based on time update
-    video.on('timeupdate', function () {
+    videojs('video_player').on('timeupdate', function () {
         console.log(this.currentTime());
         let curr_time_ = video.currentTime();
         let curr_caption_ = _captions[_current_index];
@@ -124,7 +133,7 @@ function videoAndSubtitleTracking() {
     });
 
     // listening to event fired when video ends
-    video.on('ended', function() {
+    videojs('video_player').on('ended', function() {
         storeUpdatedCaptions();
     });
 }
@@ -133,7 +142,7 @@ function videoAndSubtitleTracking() {
   Interval to refresh highlighted caption
 */
 setInterval(function () {
-    let current_time_ = video.currentTime;
+    let current_time_ = videojs('video_player').currentTime();
     if (current_time_ > (_current_end_time - duration_) || (current_time_ > _current_end_time)) {
         findCurrentCaption(current_time_);
         updateHighlightedCaption();
@@ -144,11 +153,15 @@ function findCurrentCaption(time) {
     let timeAccumulator = 0;
     for (let i = 0; i < _captions.length; i++) {
         if (timeAccumulator > time) {
+            console.log('Caption updated');
+            _current_end_time = _captions[_current_index];
             break;
         }
         _current_index++;
         timeAccumulator += _captions[_current_index].duration_;
     }
+
+    return _captions[_current_index];
 }
 
 /**
@@ -158,6 +171,36 @@ function findCurrentCaption(time) {
 function doUpdateCaption() {
     const current_caption_ = _captions[_current_index]; // getting current caption
     current_caption_.text_ = $("#source").val(); // updating caption
+
+    // updating list
+    try {
+        let wrapper = $("#subtitle_list");
+        wrapper.html('');
+        for (let line in _captions) {
+            let obj = _captions[line];
+            wrapper.append(
+                "<a class='list-group-item list-group-item-action flex-column align-items-start'>"
+                + "<div class='d-flex w-100 justify-content-between'>" +
+                + "<small>" + obj.line + "</small>"
+                + "</div>"
+                + "<p class=\"mb-1\">" + obj.text + "</p>"
+                + "<small>" + obj.startTime + " --> " + obj.endTime + "</small>"
+                + "</a>"
+            );
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+/**
+ *  Loads current caption in relevant html container for editing
+ */
+function doLoadCurrentCaption() {
+    let curr_caption_ = findCurrentCaption(video.currentTime());
+    document.getElementById("original_caption").innerHTML = curr_caption_.text_;
+    document.getElementById("original_caption_header").innerHTML = curr_caption_.start_ + " --> " + curr_caption_.end_;
+    document.getElementById("edit_caption").innerHTML = "CLICKED!";
 }
 
 // TODO: Updated current highlighted caption to currently stored values in the
@@ -170,7 +213,7 @@ function updateHighlightedCaption() {
  * Stores updated captions to new file
  */
 function storeUpdatedCaptions() {
-    let file = new File(["Hello, world!"], "updated_captions.srt", {type: "text/plain;charset=utf-8"});
-    FileSaver.saveAs(file);
+    // let file = new File(stringifySrt(), "updated_captions.srt", {type: "text/plain;charset=utf-8"});
+    // FileSaver.saveAs(file);
 }
 
