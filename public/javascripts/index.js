@@ -1,8 +1,14 @@
 import zeroFill from 'zero-fill'
+import * as FileSaver from "FileSaver";
 
 let video = videojs('video_player');
+let parse = document.querySelector('doParse');
+
+parse.onclick(doUpdateCaption());
+
 let duration_ = -1; // duration of current video
 let _current_index = -1; // index of current subtitle
+let _current_end_time = -1; // end time of the current caption
 
 let pattern = /(\d+)\n([\d:,]+)\s+-{2}>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
 let _regExp = new RegExp(pattern);
@@ -30,6 +36,20 @@ function parseCaptions(data) {
     }
 
     return _captions;
+}
+
+/*
+  Splits each caption into its component line_, start_, end_ and text_.
+ */
+function _splitCaption(caption) {
+    let duration = parseFromSrtTime(caption[3]) - parseFromSrtTime(caption[2]);
+    return {
+        line_: caption[1],
+        start_: caption[2],
+        end_: caption[3],
+        text_: caption[4],
+        duration_: duration
+    }
 }
 
 // credit: https://github.com/gsantiago/subtitle.js/blob/master/lib/toSrtTime.js
@@ -66,26 +86,12 @@ function parseFromSrtTime(time) {
 // converting elements in captions array back to srt format
 function stringifySrt () {
     return _captions.map((caption, line) => {
-        return (line > 0 ? '\n' : '') + [
+        return (line > 1 ? '\n' : '') + [
             line,
-            `${parseToSrtTime(caption.start)} --> ${parseToSrtTime(caption.end)}`,
-            caption.text
+            `${parseToSrtTime(caption.start_)} --> ${parseToSrtTime(caption.end_)}`,
+            caption.text_
         ].join('\n')
     }).join('\n') + '\n'
-}
-
-/*
-  Splits each caption into its component line_, start_, end_ and text_.
- */
-function _splitCaption(caption) {
-    let duration = parseFromSrtTime(caption[3]) - parseFromSrtTime(caption[2]);
-    return {
-        line_: caption[1],
-        start_: caption[2],
-        end_: caption[3],
-        text_: caption[4],
-        duration_: duration
-    }
 }
 
 /**
@@ -93,12 +99,15 @@ function _splitCaption(caption) {
  */
 function videoAndSubtitleTracking() {
 
-    video.on('ready', function() {
+    // listening for event fired when initial duration and dimension
+    // information is ready
+    video.on('loadedmetadata', function() {
         // keeping track of current video's duration
         duration_ = video.duration();
         _current_index = 0;
     });
 
+    // listening for event fired when video is paused
     video.on('pause', function() {
         console.log("Paused");
     });
@@ -106,15 +115,62 @@ function videoAndSubtitleTracking() {
     // updates current subtitle based on time update
     video.on('timeupdate', function () {
         console.log(this.currentTime());
+        let curr_time_ = video.currentTime();
+        let curr_caption_ = _captions[_current_index];
+        if((curr_time_ < curr_caption_.start_) || (curr_time_ > curr_caption_.end_)) {
+            findCurrentCaption(curr_time_);
+            updateHighlightedCaption();
+        }
+    });
+
+    // listening to event fired when video ends
+    video.on('ended', function() {
+        storeUpdatedCaptions();
     });
 }
 
-function doUpdateCaption()
-
-
-function updateHighlightedCaption(time) {
-    if(time > _captions[_current_index].start_) {
-
+/*
+  Interval to refresh highlighted caption
+*/
+setInterval(function () {
+    let current_time_ = video.currentTime;
+    if (current_time_ > (_current_end_time - duration_) || (current_time_ > _current_end_time)) {
+        findCurrentCaption(current_time_);
+        updateHighlightedCaption();
     }
+}, 50);
+
+function findCurrentCaption(time) {
+    let timeAccumulator = 0;
+    for (let i = 0; i < _captions.length; i++) {
+        if (timeAccumulator > time) {
+            break;
+        }
+        _current_index++;
+        timeAccumulator += _captions[_current_index].duration_;
+    }
+}
+
+/**
+ *  Updates current caption with new value currently present in
+ *  the source field.
+ */
+function doUpdateCaption() {
+    const current_caption_ = _captions[_current_index]; // getting current caption
+    current_caption_.text_ = $("#source").val(); // updating caption
+}
+
+// TODO: Updated current highlighted caption to currently stored values in the
+// TODO: _current_index and _current_end_time fields
+function updateHighlightedCaption() {
+
+}
+
+/**
+ * Stores updated captions to new file
+ */
+function storeUpdatedCaptions() {
+    let file = new File(["Hello, world!"], "updated_captions.srt", {type: "text/plain;charset=utf-8"});
+    FileSaver.saveAs(file);
 }
 

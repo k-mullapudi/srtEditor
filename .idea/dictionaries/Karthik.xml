@@ -2,6 +2,8 @@
   <dictionary name="Karthik">
     <words>
       <w>jsdom</w>
+      <w>loadedmetadata</w>
+      <w>timeupdate</w>
     </words>
   </dictionary>
 </component>
