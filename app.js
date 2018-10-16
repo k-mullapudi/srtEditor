@@ -3,6 +3,7 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let express = require('express');
+let fs = require('fs');
 
 const hostname = '127.0.0.1';
 const port = 3000;

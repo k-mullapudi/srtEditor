@@ -17,7 +17,7 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
     </script>
 
-    <script src="/javascripts/index.js"></script>
+    <script data-main="/javascripts/index.js" src="/javascripts/require.js"></script>
 </head>
 
 <body>
@@ -57,13 +57,14 @@
     </div>
 
     <div class="col-lg-5">
-        <div class="panel panel-default">
-            <div class="panel-body">
-
-            </div>
+        <div class="list-group">
+            <% captions.forEach(function(caption){ %>
+                <a href="#" class="list-group-item">
+                    <%= caption.text %>
+                </a>
+            <% })%>
         </div>
     </div>
-
 </div>
 
 <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>

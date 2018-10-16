@@ -104,39 +104,54 @@ function stringifySrt () {
 /**
  * Keeps track of all video and subtitle related functions
  */
-function videoAndSubtitleTracking() {
+define(function (require) {
+    function videoAndSubtitleTracking() {
 
-    // listening for event fired when initial duration and dimension
-    // information is ready
-    videojs('video_player').on('loadedmetadata', function() {
-        // keeping track of current video's duration
-        duration_ = video.duration();
-        _current_index = 0;
-    });
+        videojs('video_player').on('ready', function () {
+            console.log('Ready');
+            // fs.readFile(process.cwd() + '../../routes/subtitles.srt', 'utf8', function (err, data) {
+            //     if (err) {
+            //         return console.log(err);
+            //     }
+            //     _captions = parseCaptions(data);
+            //     console.log("Contents loaded...");
+            // });
+        });
 
-    // listening for event fired when video is paused
-    // loads captions for current time in caption editor container
-    videojs('video_player').on('pause', function() {
-        console.log("Paused");
-        doLoadCurrentCaption();
-    });
+        // listening for event fired when initial duration and dimension
+        // information is ready
+        videojs('video_player').on('loadedmetadata', function () {
+            // keeping track of current video's duration
+            console.log('Meta data loaded');
+            duration_ = video.duration();
+            console.log("Duration: " + duration_);
+            _current_index = 0;
+        });
 
-    // updates current subtitle based on time update
-    videojs('video_player').on('timeupdate', function () {
-        console.log(this.currentTime());
-        let curr_time_ = video.currentTime();
-        let curr_caption_ = _captions[_current_index];
-        if((curr_time_ < curr_caption_.start_) || (curr_time_ > curr_caption_.end_)) {
-            findCurrentCaption(curr_time_);
-            updateHighlightedCaption();
-        }
-    });
+        // listening for event fired when video is paused
+        // loads captions for current time in caption editor container
+        videojs('video_player').on('pause', function () {
+            console.log("Paused");
+            doLoadCurrentCaption();
+        });
 
-    // listening to event fired when video ends
-    videojs('video_player').on('ended', function() {
-        storeUpdatedCaptions();
-    });
-}
+        // updates current subtitle based on time update
+        videojs('video_player').on('timeupdate', function () {
+            console.log(this.currentTime());
+            let curr_time_ = video.currentTime();
+            let curr_caption_ = _captions[_current_index];
+            if ((curr_time_ < curr_caption_.start_) || (curr_time_ > curr_caption_.end_)) {
+                findCurrentCaption(curr_time_);
+                updateHighlightedCaption();
+            }
+        });
+
+        // listening to event fired when video ends
+        videojs('video_player').on('ended', function () {
+            storeUpdatedCaptions();
+        });
+    }
+});
 
 /*
   Interval to refresh highlighted caption
@@ -197,7 +212,7 @@ function doUpdateCaption() {
  *  Loads current caption in relevant html container for editing
  */
 function doLoadCurrentCaption() {
-    let curr_caption_ = findCurrentCaption(video.currentTime());
+    let curr_caption_ = findCurrentCaption(videojs('video_player').currentTime());
     document.getElementById("original_caption").innerHTML = curr_caption_.text_;
     document.getElementById("original_caption_header").innerHTML = curr_caption_.start_ + " --> " + curr_caption_.end_;
     document.getElementById("edit_caption").innerHTML = "CLICKED!";
