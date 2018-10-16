@@ -16,6 +16,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
     </script>
+    <script src="/javascripts/index.js"></script>
 </head>
 
 <body>
@@ -55,10 +56,10 @@
     </div>
 
     <div class="col-lg-5">
-        <p> Subtitles </p>
+        <div class="panel panel-default">
+            <div class="panel-body">
 
-        <div class="list-group" id="subtitle_list">
-
+            </div>
         </div>
     </div>
 
@@ -79,42 +80,6 @@
 </script>
 
 <script>
-    /* https://stackoverflow.com/questions/33145762/parse-a-srt-file-with-jquery-javascript/33147421 */
-    var PF_SRT = function() {
-        var pattern = /(\d+)\n([\d:,]+)\s+-{2}\>\s+([\d:,]+)\n([\s\S]*?(?=\n{2}|$))/gm;
-        var _regExp;
-
-        var init = function() {
-            _regExp = new RegExp(pattern);
-        };
-        var parse = function(f) {
-            if (typeof(f) !== "string")
-                throw "Sorry, Parser accept string only.";
-
-            var result = [];
-            if (f == null)
-                return _subtitles;
-
-            f = f.replace(/\r\n|\r|\n/g, '\n')
-
-            while ((matches = pattern.exec(f)) != null) {
-                result.push(toLineObj(matches));
-            }
-            return result;
-        }
-        var toLineObj = function(group) {
-            return {
-                line: group[1],
-                startTime: group[2],
-                endTime: group[3],
-                text: group[4]
-            };
-        }
-        init();
-        return {
-            parse: parse
-        }
-    }();
 
     $(function() {
         $("#doParse").on('click', function() {
